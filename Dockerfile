@@ -2,12 +2,21 @@ FROM alpine:3.5
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION 1.13.8
+ENV NGINX_VERSION 1.17.8
+ENV HEADERS_MORE_VERSION 0.33
+ENV NAXSI_VERSION 0.56
 
 COPY headers-more-nginx-module-0.33 /headers-more-nginx-module
 COPY naxsi-0.56rc1 /naxsi
 
-RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
+RUN apk update && \
+    apk add curl && \
+    cd / && \
+    curl -O https://codeload.github.com/openresty/headers-more-nginx-module/tar.gz/v$HEADERS_MORE_VERSION && \
+    tar -zxvf v$HEADERS_MORE_VERSION && \
+    curl -O https://codeload.github.com/nbs-system/naxsi/tar.gz/$NAXSI_VERSION && \
+    tar -zxvf $NAXSI_VERSION && \
+        GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& CONFIG="\
 		--prefix=/etc/nginx \
 		--sbin-path=/usr/sbin/nginx \
@@ -52,8 +61,8 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		--with-compat \
 		--with-file-aio \
 		--with-http_v2_module \
-		--add-module=/headers-more-nginx-module \
-		--add-module=/naxsi/naxsi_src \
+		--add-module=/headers-more-nginx-module-$HEADERS_MORE_VERSION \
+		--add-module=/naxsi-$NAXSI_VERSION/naxsi_src \
 
 	" \
 	&& addgroup -S nginx \
