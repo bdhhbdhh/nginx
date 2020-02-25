@@ -75,7 +75,6 @@ RUN apk update && \
 		pcre-dev \
 		zlib-dev \
 		linux-headers \
-		curl \
 		gnupg \
 		libxslt-dev \
 		gd-dev \
