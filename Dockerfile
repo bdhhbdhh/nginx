@@ -69,6 +69,7 @@ RUN apk update && \
 	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
 	&& apk add --no-cache --virtual .build-deps \
 		gcc \
+		gcc6 \
 		libc-dev \
 		make \
 		openssl-dev \
@@ -100,14 +101,14 @@ RUN apk update && \
 	&& rm nginx.tar.gz \
 	&& cd /usr/src/nginx-$NGINX_VERSION \
 	&& ./configure $CONFIG --with-debug \
-	&& make -j$(getconf _NPROCESSORS_ONLN) \
+	&& make CC=gcc-6 -j$(getconf _NPROCESSORS_ONLN) \
 	&& mv objs/nginx objs/nginx-debug \
 	&& mv objs/ngx_http_xslt_filter_module.so objs/ngx_http_xslt_filter_module-debug.so \
 	&& mv objs/ngx_http_image_filter_module.so objs/ngx_http_image_filter_module-debug.so \
 	&& mv objs/ngx_http_geoip_module.so objs/ngx_http_geoip_module-debug.so \
 	&& mv objs/ngx_stream_geoip_module.so objs/ngx_stream_geoip_module-debug.so \
 	&& ./configure $CONFIG \
-	&& make -j$(getconf _NPROCESSORS_ONLN) \
+	&& make CC=gcc-6 -j$(getconf _NPROCESSORS_ONLN) \
 	&& make install \
 	&& rm -rf /etc/nginx/html/ \
 	&& mkdir /etc/nginx/conf.d/ \
