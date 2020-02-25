@@ -16,6 +16,11 @@ RUN apk add --no-cache --virtual .build-deps curl gcc gcc6 libc-dev make openssl
     tar -zxC /usr/src -f nginx.tar.gz && \
     rm /nginx.tar.gz && \
     cd /usr/src/nginx-$NGINX_VERSION && \
+    nginx -V 2> /config && \
+    CONFIG=$(grep "configure arguments:" /config|cut -f 2 -d ":") && \
+    CONFIG="$CONFIG --add-module=/headers-more-nginx-module-$HEADERS_MORE_VERSION" && \
+    CONFIG="$CONFIG --add-module=/naxsi-$NAXSI_VERSION/naxsi_src" && \
+    rm -f /config && \
     ./configure $CONFIG --with-debug && \
     make CC=gcc-6 -j$(getconf _NPROCESSORS_ONLN) && \
     mv objs/nginx /usr/sbin/nginx-debug && \
@@ -26,10 +31,6 @@ RUN apk add --no-cache --virtual .build-deps curl gcc gcc6 libc-dev make openssl
     rm -rf /naxsi-$NAXSI_VERSION && \
     rm -rf /usr/src/nginx-$NGINX_VERSION && \
     apk del .build-deps
-    
-       
-		--add-module=/headers-more-nginx-module-$HEADERS_MORE_VERSION 
-		--add-module=/naxsi-$NAXSI_VERSION/naxsi_src \
 
 EXPOSE 80
 STOPSIGNAL SIGTERM
